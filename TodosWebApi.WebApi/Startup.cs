@@ -1,16 +1,11 @@
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using TodosWebApi.WebApi.Data;
 
 namespace TodosWebApi.WebApi
 {
@@ -26,6 +21,14 @@ namespace TodosWebApi.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var connectionString = Configuration.GetConnectionString("Default");
+
+            services.AddDbContext<DataContext>(o => o.UseSqlServer(connectionString));
+            // services.AddCors();
+            services.AddCors(options => options.AddPolicy("ApiCorsPolicy", builder =>
+            {
+                builder.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader(); // Dabar leidžiama prieiti tik nurodytam localhost
+            }));
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -43,6 +46,15 @@ namespace TodosWebApi.WebApi
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TodosWebApi.WebApi v1"));
             }
+
+            //app.UseCors(builder => builder // Leidžiama bet kam naudotis Cors, bet tas yra labai nesaugu
+            //.AllowAnyOrigin()
+            //.AllowAnyMethod()
+            //.AllowAnyHeader());  
+
+            // Įdedamas naujas kodo gabaliukas
+
+            app.UseCors("ApiCorsPolicy");
 
             app.UseHttpsRedirection();
 
