@@ -46,20 +46,20 @@ namespace TodosWebApi.WebApi.Controllers
             return item;
         }
 
-        /*[HttpDelete("{id}")]
-        public async Task<TodoItem> DeleteTitle(int id)
+        [HttpDelete("{id}")]
+        public async Task <IActionResult> DeleteTitle(int id)
         {
-            var item = await _context.Items.FAsyny(id);
+            var item = await _context.Items.FindAsync(id);
 
             if (item == null)
             {
-                return NotFound(item);
-            }
+                return NotFound();
+            } 
             _context.Items.Remove(item);
             await _context.SaveChangesAsync();
 
-            return NoContent(item);
-        }*/
+            return NoContent();
+        }
     }
     
 }
